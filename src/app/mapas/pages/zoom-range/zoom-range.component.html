@@ -3,10 +3,18 @@
 <div class="row">
   <div class="col-12">
     <label class="form-label">
-      Zoom: 16
+      Zoom: {{ zoomLevel | number: '2.2-2' }}
       - Lng, Lat: [124, 454]
     </label>
-    <input type="range" class="form-range" id="customRange1">
+    <input
+      [value]="zoomLevel"
+      type="range"
+      min="0"
+      max="18"
+      class="form-range"
+      #zoomInput
+      (input)="zoomCambio( zoomInput.value )"
+      id="customRange1">
   </div>
   <div class="col-12">
     <button (click)="zoomOut()" class="btn btn-primary"> - </button>
