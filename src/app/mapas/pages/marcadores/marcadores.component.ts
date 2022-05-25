@@ -3,7 +3,8 @@ import * as mapboxgl from 'mapbox-gl';
 
 interface CustomMarker {
   color: string;
-  marker: mapboxgl.Marker;
+  marker?: mapboxgl.Marker;
+  centro?: [number, number]
 }
 
 @Component({
@@ -75,10 +76,40 @@ export class MarcadoresComponent implements AfterViewInit {
       color,
       marker: newMarker
     } );
+
+    this.saveMarkersLocalStorage()
+  };
+
+  goMarker( marker: mapboxgl.Marker ){
+    this.mapa.flyTo({
+      center: marker.getLngLat()
+    });
+
   }
 
-  goMarker(){
+  saveMarkersLocalStorage() {
 
+    const lngLatArr: CustomMarker[] = [];
+
+    this.marcadores.forEach( m => {
+
+      const color = m.color;
+      const { lng, lat } = m.marker!.getLngLat();
+
+      lngLatArr.push({
+        color,
+        centro: [ lng, lat ]
+      });
+
+      localStorage.setItem('marcadores', JSON.stringify(lngLatArr));
+    });
+  }
+
+  readLocalStorage() {
+
+    if( !localStorage.getItem('marcadores')) return;
+
+    const lngLatArr: CustomMarker[] = JSON.parse(localStorage.getItem('marcadores')! )
   }
 
 
