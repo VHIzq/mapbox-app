@@ -50,6 +50,9 @@ export class MarcadoresComponent implements AfterViewInit {
       zoom: this.zoomLevel,
     });
 
+
+    this.readLocalStorage();
+
     /* const markerHTML: HTMLElement = document.createElement('div');
     markerHTML.innerHTML = 'Hola Jupiter'
 
@@ -77,7 +80,11 @@ export class MarcadoresComponent implements AfterViewInit {
       marker: newMarker
     } );
 
-    this.saveMarkersLocalStorage()
+    this.saveMarkersLocalStorage();
+
+    newMarker.on('dragend', () => {
+      this.saveMarkersLocalStorage();
+    });
   };
 
   goMarker( marker: mapboxgl.Marker ){
@@ -97,7 +104,7 @@ export class MarcadoresComponent implements AfterViewInit {
       const { lng, lat } = m.marker!.getLngLat();
 
       lngLatArr.push({
-        color,
+        color: color,
         centro: [ lng, lat ]
       });
 
@@ -110,6 +117,33 @@ export class MarcadoresComponent implements AfterViewInit {
     if( !localStorage.getItem('marcadores')) return;
 
     const lngLatArr: CustomMarker[] = JSON.parse(localStorage.getItem('marcadores')! )
+
+    console.log(lngLatArr);
+
+    lngLatArr.forEach( m => {
+      const newMsrker = new mapboxgl.Marker({
+        color: m.color,
+        draggable: true,
+      })
+      .setLngLat( m.centro! )
+      .addTo( this.mapa )
+      //* reconstruye el objeto marker para que sea ingresado al localstorage
+      this.marcadores.push({
+        marker: newMsrker,
+        color: m.color
+      });
+
+      newMsrker.on('dragend', () => {
+        this.saveMarkersLocalStorage();
+      })
+    })
+  }
+
+  deleteMarker( i: number ){
+    this.marcadores[i].marker?.remove();
+    this.marcadores.splice(i, 1);
+    this.saveMarkersLocalStorage();
+
   }
 
 
